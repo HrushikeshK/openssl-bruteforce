@@ -1,7 +1,7 @@
-###################################################################################
-# Author: hkh4cks                                                                 #
-# Usage: python2.7 brute.py <wordlist> <cipher list> <encrypted file> 2> /dev/null#
-###################################################################################
+####################################################################################
+# Author: hkh4cks                                                                  #
+# Usage: python2.7 brute.py <wordlist> <cipher list> <encrypted file> 2> /dev/null #
+####################################################################################
 
 from __future__ import print_function
 from multiprocessing import Process
