@@ -20,7 +20,6 @@ ciphers = open(sys.argv[2], 'r').read().strip().split('\n')
 enc_file = sys.argv[3]
 dev_null = open('/dev/null', 'w')
 
-print(ciphers)
 
 def crack(loots, cipher):
     print("Running pid: {}\tCipher: {}".format(os.getpid(),cipher))
