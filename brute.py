@@ -4,7 +4,7 @@
 ####################################################################################
 
 from __future__ import print_function
-from multiprocessing import Process
+from multiprocessing import Process, Manager
 import subprocess
 import sys
 import os
@@ -14,12 +14,13 @@ if len(sys.argv) != 4:
     print("Usage: {} <path to wordlist> <path to cipher list> <path to encrypted file>".format(sys.argv[0]))
     exit(1)
 
+
 wordlist = open(sys.argv[1], 'r').read().strip().split('\n')[:-1]
 ciphers = open(sys.argv[2], 'r').read().strip().split('\n')[:-1]
 enc_file = sys.argv[3]
 dev_null = open('/dev/null', 'w')
 
-def crack(cipher):
+def crack(loots, cipher):
     print("Running pid: {}\tCipher: {}".format(os.getpid(),cipher))
     filename = cipher
     for word in wordlist:
@@ -28,10 +29,11 @@ def crack(cipher):
             op = subprocess.check_output(cmd, stderr=dev_null, shell=True)
             op = subprocess.check_output("file " + filename,shell=True)
             if 'ASCII text' in op:
+                print("-" * 50)
                 print("Password found with algorithm {}: {}".format(cipher,word))
                 print("Data: \n{}".format(open(filename, 'r').read()))
-                print("------------------------------------------")
-                found[cipher] = word
+                print("-" * 50)
+                loots[cipher] = word
 
             else:
                 if os.path.isfile(filename):
@@ -44,14 +46,19 @@ def crack(cipher):
             continue
 
 
-found = dict()
-threads = list()
-for cipher in ciphers:
-    p = Process(target=crack, args = (cipher,))
-    threads.append(p)
-    p.start()
-    p.join()
-print("Found {} ciphers with passwords".format(len(found)))
-print(found)
-for cipher,passwd in found:
-    print("Cipher: {}\tPassword: {}".format(cipher,passwd))
+def main():
+    manager = Manager()
+    loots = manager.dict()
+    threads = list()
+    for cipher in ciphers:
+        p = Process(target=crack, args = (loots, cipher))
+        threads.append(p)
+        p.start()
+        p.join()
+    print("-" * 50)
+    print("Found {} ciphers with passwords".format(len(loots)))
+    for loot in loots.keys():
+        print("Cipher: {}\tPassword: {}".format(loot,loots[loot]))
+
+if __name__ == '__main__':
+    main()
