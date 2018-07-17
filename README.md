@@ -7,6 +7,6 @@ Python tool to bruteforce ciphers against a wordilst
 # Usage
 
 ```
-python2.7 brute.py <path to wordlist> <path to ciphers.txt> <path to encrypted file> 2> /dev/null
+python2.7 brute.py <path to wordlist> <path to ciphers.txt> <path to encrypted file> 
 ```
 

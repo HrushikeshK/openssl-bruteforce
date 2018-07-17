@@ -14,8 +14,8 @@ if len(sys.argv) != 4:
     print("Usage: {} <path to wordlist> <path to cipher list> <path to encrypted file>".format(sys.argv[0]))
     exit(1)
 
-wordlist = open(sys.argv[1], 'r').read().split('\n')[:-1]
-ciphers = open(sys.argv[2], 'r').read().split('\n')[:-1]
+wordlist = open(sys.argv[1], 'r').read().strip().split('\n')[:-1]
+ciphers = open(sys.argv[2], 'r').read().strip().split('\n')[:-1]
 enc_file = sys.argv[3]
 dev_null = open('/dev/null', 'w')
 
@@ -31,12 +31,12 @@ def crack(cipher):
                 print("Password found with algorithm {}: {}".format(cipher,word))
                 print("Data: \n{}".format(open(filename, 'r').read()))
                 print("------------------------------------------")
-                found.append((cipher,word))
+                found[cipher] = word
 
             else:
                 if os.path.isfile(filename):
-                    #subprocess.check_output("rm " + filename)
-                    os.system("rm " + filename)
+                    subprocess.check_output("rm " + filename, stderr=dev_null, shell=True)
+                    #os.system("rm " + filename)
 
             exit(1)
 
@@ -44,7 +44,7 @@ def crack(cipher):
             continue
 
 
-found = list()
+found = dict()
 threads = list()
 for cipher in ciphers:
     p = Process(target=crack, args = (cipher,))
