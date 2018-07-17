@@ -17,6 +17,7 @@ if len(sys.argv) != 4:
 wordlist = open(sys.argv[1], 'r').read().split('\n')[:-1]
 ciphers = open(sys.argv[2], 'r').read().split('\n')[:-1]
 enc_file = sys.argv[3]
+dev_null = open('/dev/null', 'w')
 
 def crack(cipher):
     print("Running pid: {}\tCipher: {}".format(os.getpid(),cipher))
@@ -24,8 +25,8 @@ def crack(cipher):
     for word in wordlist:
         try:
             cmd = "echo " + word + " | openssl enc -d -a -" + cipher + " -in " + enc_file + " -out " + filename + " -pass stdin"
-            op = subprocess.check_output(cmd, shell=True)
-            op = subprocess.check_output("file " + filename, stderr=subprocess.STDOUT, shell=True)
+            op = subprocess.check_output(cmd, stderr=dev_null, shell=True)
+            op = subprocess.check_output("file " + filename,shell=True)
             if 'ASCII text' in op:
                 print("Password found with algorithm {}: {}".format(cipher,word))
                 print("Data: \n{}".format(open(filename, 'r').read()))
@@ -51,5 +52,6 @@ for cipher in ciphers:
     p.start()
     p.join()
 print("Found {} ciphers with passwords".format(len(found)))
+print(found)
 for cipher,passwd in found:
     print("Cipher: {}\tPassword: {}".format(cipher,passwd))
